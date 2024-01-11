@@ -19,11 +19,11 @@ model User {
   address       String
   role          Role_User @default(user)
   referral_code String
-  active        Int
+  active        Int       @default(1)
   image         String
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @db.Timestamp()
+  updatedAt DateTime @default(now())
 
   Event       Event[]
   Transaction Transaction[]
@@ -42,7 +42,7 @@ model Event {
   status      Event_Status @default(pending)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @db.Timestamp()
+  updatedAt DateTime @default(now())
 
   Event_Ticket      Event_Ticket[]
   User_Event_Ticket User_Event_Ticket[]
