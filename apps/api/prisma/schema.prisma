@@ -10,12 +10,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  id            String    @id @default(uuid())
+  email         String
+  name          String
+  password      String
+  phone_number  String
+  address       String
+  role          Role_User @default(user)
+  referral_code String
+  active        Int
+  image         String
 
-  @@map("samples") // if you want to use snake_case format
+  createdAt DateTime @default(now())
+  updatedAt DateTime @db.Timestamp()
+
+  Event       Event[]
+  Transaction Transaction[]
+}
+
+model Event {
+  id String @id @default(uuid())
+
+  organizer    User   @relation(fields: [organizer_id], references: [id])
+  organizer_id String
+
+  title       String
+  location    String
+  description String
+  date        DateTime
+  status      Event_Status @default(pending)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @db.Timestamp()
+
+  Event_Ticket      Event_Ticket[]
+  User_Event_Ticket User_Event_Ticket[]
+  Event_Category    Event_Category[]
+}
+
+model Event_Image {
+  id       String @id @default(uuid())
+  filename String
+}
+
+enum Event_Status {
+  pending
+  approved
+}
+
+model Event_Category {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  event    Event  @relation(fields: [event_id], references: [id])
+  event_id String
+}
+
+model Event_Ticket {
+  id String @id @default(uuid())
+
+  event    Event  @relation(fields: [event_id], references: [id])
+  event_id String
+  category String
+  quota    Int
+  code     String
+}
+
+model User_Event_Ticket {
+  id String @id @default(uuid())
+
+  event_ticket    Event  @relation(fields: [event_ticket_id], references: [id])
+  event_ticket_id String
+}
+
+model Transaction {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  price   Int
+}
+
+model Rating {
+  id     String @id @default(uuid())
+  rating Float
+  review String @db.Text
+}
+
+model Discount_Coupon {
+  id       String   @id @default(uuid())
+  price    Int
+  exp_date DateTime
+}
+
+enum Role_User {
+  super_admin
+  admin
+  organizer
+  user
 }
