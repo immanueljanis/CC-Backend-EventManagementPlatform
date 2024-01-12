@@ -3,10 +3,10 @@ import express, { Router } from "express"
 
 const router: Router = express.Router()
 
-router.get("/", AdminController.getAllAdmin)
+router.get("/", AdminController.getAdminById)
 router.post("/", AdminController.createAdmin)
-
-router.get("/test", AdminController.testApi)
+router.delete("/", AdminController.deleteAdminById)
+router.put("/", AdminController.updateAdminById)
 
 
 export default router
