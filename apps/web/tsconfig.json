@@ -33,10 +33,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/Header.jsx",
-    "src/components/Footer.jsx",
-    "src/app/page.jsx",
-    "src/app/layout.jsx"
+    "src/components/Navbar.js",
+    "src/components/Footer.js",
+    "src/app/page.js",
+    "src/app/layout.js"
   ],
   "exclude": [
     "node_modules"
