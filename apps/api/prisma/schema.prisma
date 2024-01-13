@@ -49,6 +49,12 @@ model Event {
   Event_Category    Event_Category[]
 }
 
+model Category {
+  id             Int              @id @default(autoincrement())
+  name           String
+  Event_Category Event_Category[]
+}
+
 model Event_Image {
   id       String @id @default(uuid())
   filename String
@@ -60,8 +66,10 @@ enum Event_Status {
 }
 
 model Event_Category {
-  id   Int    @id @default(autoincrement())
-  name String
+  id Int @id @default(autoincrement())
+
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
 
   event    Event  @relation(fields: [event_id], references: [id])
   event_id String
