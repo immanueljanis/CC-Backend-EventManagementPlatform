@@ -84,7 +84,6 @@ export const updateAdminById = async (req: Request, res: Response) => {
         const { id } = req.query
         const { email, name, password, phone_number, address, image } = req.body
 
-        console.log(req.params)
         const existingAdmin = await prisma.user.findUnique({
             where: {
                 id: String(id)
