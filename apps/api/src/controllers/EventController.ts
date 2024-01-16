@@ -30,7 +30,7 @@ export const createEvent = async (req: Request, res: Response) => {
         const { organizer_id, title, location, description, date, category_id, event_image, event_ticket } = req.body
 
         await prisma.$transaction(async (tx) => {
-            const dataEvent = await prisma.event.create({
+            const dataEvent = await tx.event.create({
                 data: {
                     organizer_id,
                     title,
@@ -41,21 +41,21 @@ export const createEvent = async (req: Request, res: Response) => {
                 }
             })
 
-            await prisma.event_Category.createMany({
+            await tx.event_Category.createMany({
                 data: [
                     { event_id: dataEvent.id, category_id: 2 }, { event_id: dataEvent.id, category_id: 3 }
                 ]
 
             })
 
-            await prisma.event_Image.createMany({
+            await tx.event_Image.createMany({
                 data: [
                     { filename: "testing1.jpg", event_id: dataEvent.id },
                     { filename: "testing2.jpg", event_id: dataEvent.id }
                 ]
             })
 
-            await prisma.event_Ticket.createMany({
+            await tx.event_Ticket.createMany({
                 data: [
                     { event_id: dataEvent.id, category: "Cat 1", quota: 100, code: "CAT1" },
                     { event_id: dataEvent.id, category: "Cat 2", quota: 50, code: "CAT2" },
