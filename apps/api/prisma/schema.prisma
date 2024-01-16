@@ -92,6 +92,8 @@ model Event_Ticket {
 
   event    Event  @relation(fields: [event_id], references: [id])
   event_id String
+
+  price    Int
   category String
   quota    Int
   code     String
