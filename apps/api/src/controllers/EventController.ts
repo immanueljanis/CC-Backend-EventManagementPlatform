@@ -57,8 +57,8 @@ export const createEvent = async (req: Request, res: Response) => {
 
             await tx.event_Ticket.createMany({
                 data: [
-                    { event_id: dataEvent.id, category: "Cat 1", quota: 100, code: "CAT1" },
-                    { event_id: dataEvent.id, category: "Cat 2", quota: 50, code: "CAT2" },
+                    { event_id: dataEvent.id, category: "Cat 1", quota: 100, code: "CAT1", price: 100000 },
+                    { event_id: dataEvent.id, category: "Cat 2", quota: 50, code: "CAT2", price: 50000 },
                 ]
             })
 

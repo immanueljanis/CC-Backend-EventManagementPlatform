@@ -26,6 +26,14 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Test root api")
 })
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    res.status(500).send({
+        error: true,
+        message: err,
+        data: null
+    })
+})
+
 app.listen(PORT, () => {
     console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
 })

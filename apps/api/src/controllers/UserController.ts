@@ -1,7 +1,8 @@
 import { Request, Response } from "express"
 import prisma from "@/prisma"
 import { referralGenerator } from "@/lib/referralGenerator"
-import { hashPassword } from "@/lib/hashPassword"
+import { comparePassword, hashPassword } from "@/lib/hashPassword"
+import { jwtCreate } from "@/lib/JWT"
 
 export const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -165,6 +166,39 @@ export const deleteUserById = async (req: Request, res: Response) => {
         res.status(500).send({
             error: true,
             message: error,
+            data: null
+        })
+    }
+}
+
+export const userLogin = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body
+
+        const admin = await prisma.user.findFirst({
+            where: {
+                email: email
+            }
+        })
+        if (!admin) throw ("Email not found")
+
+        const validatePassword = await comparePassword(password, admin?.password)
+        if (!validatePassword) throw ("Password doesnt match")
+
+        const userLoginToken = await jwtCreate({ id: admin.id, role: "user" })
+
+        res.status(200).send({
+            error: false,
+            message: "Login success",
+            data: {
+                email: admin.email,
+                token: userLoginToken
+            }
+        })
+    } catch (error) {
+        res.status(500).send({
+            error: true,
+            message: "Login failed",
             data: null
         })
     }
