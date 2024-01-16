@@ -25,8 +25,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  Event       Event[]
-  Transaction Transaction[]
+  Event               Event[]
+  Transaction         Transaction[]
+  Event_Rating        Event_Rating[]
+  User_Event_Ticket   User_Event_Ticket[]
+  userWhoHaveReferral Referral_code[]     @relation("userWhoHaveReferral")
+  userWhoUseReferral  Referral_code[]     @relation("userWhoUseReferral")
 }
 
 model Event {
@@ -40,6 +44,7 @@ model Event {
   description String
   date        DateTime
   status      Event_Status @default(pending)
+  active      Int          @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -47,6 +52,9 @@ model Event {
   Event_Ticket      Event_Ticket[]
   User_Event_Ticket User_Event_Ticket[]
   Event_Category    Event_Category[]
+  Event_Image       Event_Image[]
+  Event_Rating      Event_Rating[]
+  Transaction       Transaction[]
 }
 
 model Category {
@@ -56,7 +64,11 @@ model Category {
 }
 
 model Event_Image {
-  id       String @id @default(uuid())
+  id String @id @default(uuid())
+
+  event    Event  @relation(fields: [event_id], references: [id])
+  event_id String
+
   filename String
 }
 
@@ -90,25 +102,52 @@ model User_Event_Ticket {
 
   event_ticket    Event  @relation(fields: [event_ticket_id], references: [id])
   event_ticket_id String
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  qty     Int
 }
 
 model Transaction {
-  id      String @id @default(uuid())
+  id String @id @default(uuid())
+
   user    User   @relation(fields: [user_id], references: [id])
   user_id String
-  price   Int
+
+  event    Event  @relation(fields: [event_id], references: [id])
+  event_id String
+
+  price Int
+
+  referral_used String
+  referral      Referral_code @relation(fields: [referral_used], references: [id])
 }
 
-model Rating {
-  id     String @id @default(uuid())
+model Event_Rating {
+  id String @id @default(uuid())
+
+  users_id String
+  users    User   @relation(fields: [users_id], references: [id])
+
+  event_id String
+  event    Event  @relation(fields: [event_id], references: [id])
+
   rating Float
-  review String @db.Text
+  review String @db.LongText
 }
 
-model Discount_Coupon {
-  id       String   @id @default(uuid())
-  price    Int
-  exp_date DateTime
+model Referral_code {
+  id    String @id @default(uuid())
+  price Int
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], name: "userWhoHaveReferral")
+
+  references_id String
+  references    User   @relation(fields: [references_id], references: [id], name: "userWhoUseReferral")
+
+  exp_date    DateTime
+  Transaction Transaction[]
 }
 
 enum Role_User {
