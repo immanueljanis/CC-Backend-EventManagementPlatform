@@ -49,12 +49,11 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  Event_Ticket      Event_Ticket[]
-  User_Event_Ticket User_Event_Ticket[]
-  Event_Category    Event_Category[]
-  Event_Image       Event_Image[]
-  Event_Rating      Event_Rating[]
-  Transaction       Transaction[]
+  Event_Ticket   Event_Ticket[]
+  Event_Category Event_Category[]
+  Event_Image    Event_Image[]
+  Event_Rating   Event_Rating[]
+  Transaction    Transaction[]
 }
 
 model Category {
@@ -64,7 +63,7 @@ model Category {
 }
 
 model Event_Image {
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
 
   event    Event  @relation(fields: [event_id], references: [id])
   event_id String
@@ -93,17 +92,21 @@ model Event_Ticket {
   event    Event  @relation(fields: [event_id], references: [id])
   event_id String
 
-  price    Int
-  category String
-  quota    Int
-  code     String
+  price             Int
+  category          String
+  quota             Int
+  code              String
+  User_Event_Ticket User_Event_Ticket[]
 }
 
 model User_Event_Ticket {
   id String @id @default(uuid())
 
-  event_ticket    Event  @relation(fields: [event_ticket_id], references: [id])
+  event_ticket    Event_Ticket @relation(fields: [event_ticket_id], references: [id])
   event_ticket_id String
+
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  transaction_id String
 
   user    User   @relation(fields: [user_id], references: [id])
   user_id String
@@ -121,8 +124,8 @@ model Transaction {
 
   price Int
 
-  referral_used String
-  referral      Referral_code @relation(fields: [referral_used], references: [id])
+  referral_used     String
+  User_Event_Ticket User_Event_Ticket[]
 }
 
 model Event_Rating {
@@ -148,8 +151,7 @@ model Referral_code {
   references_id String
   references    User   @relation(fields: [references_id], references: [id], name: "userWhoUseReferral")
 
-  exp_date    DateTime
-  Transaction Transaction[]
+  exp_date DateTime
 }
 
 enum Role_User {

@@ -26,3 +26,16 @@ export const tokenVerifyEvent = async (req: Request, res: Response, next: NextFu
         next(error)
     }
 }
+
+export const tokenVerifyTransaction = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const accessLoginToken: any = req?.headers?.authorization
+        const payload: any = await jwtVerify(accessLoginToken)
+        const access = ["super_admin", "user"]
+
+        if (!access.includes(payload.role)) throw ("Unauthorized access")
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
