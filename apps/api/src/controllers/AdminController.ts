@@ -1,5 +1,8 @@
 import { Request, Response } from "express"
 import prisma from "@/prisma"
+import { referralGenerator } from "@/lib/referralGenerator"
+import { comparePassword, hashPassword } from "@/lib/hashPassword"
+import { jwtCreate } from "@/lib/JWT"
 
 export const getAllAdmin = async (req: Request, res: Response) => {
     try {
@@ -25,18 +28,18 @@ export const getAllAdmin = async (req: Request, res: Response) => {
 
 export const createAdmin = async (req: Request, res: Response) => {
     try {
-        const { email, name, password, phone_number, address, referral_code } = req.body
+        const { email, name, password, phone_number, address, image } = req.body
 
         await prisma.user.create({
             data: {
                 email,
                 name,
-                password,
+                password: await hashPassword(password),
                 phone_number,
                 address,
                 role: "admin",
-                referral_code,
-                image: "testImage",
+                referral_code: await referralGenerator(),
+                image,
             }
         })
 
@@ -137,6 +140,41 @@ export const deleteAdminById = async (req: Request, res: Response) => {
         res.status(500).send({
             error: true,
             message: error.message,
+            data: null
+        })
+    }
+}
+
+export const adminLogin = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body
+
+        const admin = await prisma.user.findFirst({
+            where: {
+                email: email,
+                role: "admin"
+            }
+        })
+
+        if (!admin) throw ("Email not found")
+
+        const validatePassword = await comparePassword(password, admin?.password)
+        if (!validatePassword) throw ("Password doesnt match")
+
+        const userLoginToken = await jwtCreate({ id: admin.id, role: admin.role })
+
+        res.status(200).send({
+            error: false,
+            message: "Login success",
+            data: {
+                email: admin.email,
+                token: userLoginToken
+            }
+        })
+    } catch (error) {
+        res.status(500).send({
+            error: true,
+            message: "Login failed",
             data: null
         })
     }
