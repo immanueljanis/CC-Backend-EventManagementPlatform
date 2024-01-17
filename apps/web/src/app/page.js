@@ -1,5 +1,14 @@
+import Hero from "@/components/Hero"
+import Event from "@/components/event"
+import Category from "@/components/category"
+
+
 export default function Home() {
   return (
-    <p>Testing</p>
+   <>
+   <Hero/>
+   <Event/>
+   <Category/>
+   </>
   )
 }
