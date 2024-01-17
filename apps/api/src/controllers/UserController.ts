@@ -75,7 +75,8 @@ export const getUserById = async (req: Request, res: Response) => {
                 email: true,
                 address: true,
                 referral_code: true,
-                phone_number: true
+                phone_number: true,
+                image: true,
             }
         })
 
@@ -185,7 +186,7 @@ export const userLogin = async (req: Request, res: Response) => {
         const validatePassword = await comparePassword(password, admin?.password)
         if (!validatePassword) throw ("Password doesnt match")
 
-        const userLoginToken = await jwtCreate({ id: admin.id, role: "user" })
+        const userLoginToken = await jwtCreate({ id: admin.id, role: admin.role })
 
         res.status(200).send({
             error: false,
