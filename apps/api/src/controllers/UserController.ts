@@ -1,8 +1,8 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import prisma from "@/prisma"
 import { referralGenerator } from "@/lib/referralGenerator"
 import { comparePassword, hashPassword } from "@/lib/hashPassword"
-import { jwtCreate } from "@/lib/JWT"
+import { jwtCreate, jwtVerify } from "@/lib/JWT"
 
 export const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -193,6 +193,7 @@ export const userLogin = async (req: Request, res: Response) => {
             message: "Login success",
             data: {
                 email: admin.email,
+                name: admin.name,
                 token: userLoginToken
             }
         })
@@ -202,5 +203,26 @@ export const userLogin = async (req: Request, res: Response) => {
             message: "Login failed",
             data: null
         })
+    }
+}
+
+export const userKeepLogin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenDecoded: any = req.headers?.authorization
+        const isLogin = await prisma.user.findUnique({
+            where: {
+                id: tokenDecoded?.id
+            }
+        })
+
+        if (!isLogin) throw ("Something wrong, please login again")
+
+        res.status(200).send({
+            error: false,
+            message: "Get user who is login success",
+            data: isLogin
+        })
+    } catch (error) {
+        next(error)
     }
 }
