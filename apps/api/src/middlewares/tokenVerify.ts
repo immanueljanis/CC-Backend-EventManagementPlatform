@@ -6,10 +6,13 @@ export const tokenVerifyUser = async (req: Request, res: Response, next: NextFun
         const userLoginToken: any = req.headers.authorization
         const payload: any = await jwtVerify(userLoginToken)
 
+
         if (payload.role != "user") throw ("unauthorized access")
+        req.headers.authorization = payload
 
         next()
     } catch (error) {
+        console.log(error)
         next(error)
     }
 }
