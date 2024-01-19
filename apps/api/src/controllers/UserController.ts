@@ -178,7 +178,10 @@ export const userLogin = async (req: Request, res: Response) => {
 
         const admin = await prisma.user.findFirst({
             where: {
-                email: email
+                AND: [
+                    { email: email },
+                    { role: "user" }
+                ]
             }
         })
         if (!admin) throw ("Email not found")
@@ -200,7 +203,7 @@ export const userLogin = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).send({
             error: true,
-            message: "Login failed",
+            message: error,
             data: null
         })
     }
