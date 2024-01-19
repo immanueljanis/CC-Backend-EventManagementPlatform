@@ -40,7 +40,7 @@ export const createUser = async (req: Request, res: Response) => {
                 phone_number,
                 address,
                 referral_code: referralGenerator(),
-                image
+                image: "testing.jpg"
             }
         })
 

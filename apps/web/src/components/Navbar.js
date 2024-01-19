@@ -36,20 +36,6 @@ export default function Page() {
         dispatch(setUser(null))
     }
 
-    // const getCookies = async () => {
-    //     try {
-    //         const { value } = await getCookies()
-    //         if (value) {
-    //             let res = await axiosInstance.get(`/user/${value}`)
-
-    //             console.log(value, res)
-    //             dispatch(setUser(res))
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
-
     // const getProducts = async () => {
     //     try {
     //         const res = await axios.get(`http://localhost:5003/products?name=${searchText}`)
@@ -85,7 +71,7 @@ export default function Page() {
 
                         </ul>
                     </div>
-                    <a className="btn btn-ghost text-xl">Mendadak Event</a>
+                    <Link href={"/"} className="btn btn-ghost text-xl">Mendadak Event</Link>
                 </div>
                 <div className="form-control">
                     <input
@@ -123,6 +109,7 @@ export default function Page() {
                         :
                         <>
                             <Link href={"/register"} className="btn w-24">Register</Link>
+                            <Link href={"/login"} className="btn w-24">Login</Link>
                         </>
                     }
                 </div>
