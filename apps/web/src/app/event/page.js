@@ -1,6 +1,9 @@
+'use client'
 import Image from "next/image"
 import { GoClockFill } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
+import axios from "axios";
+import { useEffect , useState } from "react";
 
 import { BsCalendar2DateFill } from "react-icons/bs";
 
@@ -22,13 +25,35 @@ const gambar = [
 
 
 export default function Page(){
+
+    const [data , setData] = useState({})
+    const [tabOpen , setTabOpen] = useState(null)
+
+    const fetchData = async() => {
+        try {
+            const res = await axios.get('http://localhost:5001/event/1')
+           
+            setData(res.data)
+            setTabOpen(res.data.description)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const onChangeTabOpen = (e) => {
+        setTabOpen(data[e.target.getAttribute('name')])
+    }
+
+    useEffect(() =>{
+        fetchData()
+    },[])
     return (
 
 
         <container className="">
             {gambar.map((item, index) =>{
                 return (
-                    <div className=" px-24 h-full border">
+                    <>
+                    <div key={index} className=" h-full border">
                         <div>
                             <ul className="flex gap-3 ">
                             <li> 
@@ -82,22 +107,54 @@ export default function Page(){
                             </div>
                                      
                         </div>
-                        <div className="grid col-span-3">
-                            {item.description}
                         </div>
-                        <div className="grid pt-5">
-                            <div className="card w-96 bg-base-100 shadow-xl col-span-2">
+
+
+                        <div className="grid grid-cols-5 card-body">
+                        <div className="col-span-3">
+                        <div className="flex justify-center">
+                                <div name="description" onClick={(e) => onChangeTabOpen(e)} className="bg-base-100 rounded-md border-b-4 h-[2vw] w-full flex justify-center" >
+                                Description
+                                </div>
+                                <div name='tickets' onClick={(e) => onChangeTabOpen(e)} className="bg-base-100 px-3 rounded-md border-b-4 h-[2vw] w-full flex justify-center">
+                                Tickets 
+                                </div>
+                            </div>
+                        <div className="">
+                            {
+                            typeof tabOpen === 'string'?
+                                    tabOpen
+                                :
+                                    typeof tabOpen === 'object'?
+                                        tabOpen?.map((item) => {
+                                            return(
+                                                <div>
+                                                    {item.category}
+                                                </div>
+                                            )
+                                        })
+                                    :
+                                        null
+                            }
+                        </div>
+                        </div>
+
+
+                        <div className="flex ml-card col-span-2 bg-base-100 shadow-xl">
+                        <div className="card w-96 bg-base-100 shadow-xl col-span-2">
                                 <div className="card-body">
                                     <p>Choose your ticket !!</p>
                                     <div className="card-actions justify-center items-center">
                                     <button className="btn btn-primary w-full">Buy Now</button>
                                     </div>
                                 </div>
-                                </div>
+                        </div>
+                            
+                                     
                         </div>
                         </div>
                     </div>
-
+                    </>
                 )
             })}
             
