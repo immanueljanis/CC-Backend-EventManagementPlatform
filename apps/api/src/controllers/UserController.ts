@@ -103,7 +103,9 @@ export const getUserById = async (req: Request, res: Response) => {
 export const updateUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const { email, name, password, phone_number, address, image } = req.body
+        const { email, name, password, phone_number, address } = req.body
+
+        let newPassword: string = ""
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -112,6 +114,11 @@ export const updateUserById = async (req: Request, res: Response) => {
         })
 
         if (!existingUser) throw ("User id not found")
+        if (!password) {
+            newPassword = existingUser.password
+        } else {
+            newPassword = await hashPassword(password)
+        }
 
         const updatedUser = await prisma.user.update({
             where: {
@@ -120,10 +127,9 @@ export const updateUserById = async (req: Request, res: Response) => {
             data: {
                 email: email || existingUser?.email,
                 name: name || existingUser?.name,
-                password: await hashPassword(password) || existingUser?.password,
+                password: newPassword,
                 phone_number: phone_number || existingUser?.phone_number,
-                address: address || existingUser?.address,
-                image: image || existingUser?.image,
+                address: address || existingUser?.address
             }
         })
 
@@ -135,8 +141,7 @@ export const updateUserById = async (req: Request, res: Response) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 phone_number: updatedUser.phone_number,
-                address: updatedUser.address,
-                image: updatedUser.image
+                address: updatedUser.address
             }
         })
     } catch (error: any) {

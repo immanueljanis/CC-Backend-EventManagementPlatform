@@ -27,5 +27,23 @@
         {
             "name" : "Indomie Goreng Panggang "
         }
+    ],
+    "event" : [
+        {
+            "id" : 1,
+            "description" : "Ini Event Terbaik",
+            "tickets" : [
+                {
+                    "id" : 1,
+                    "category" : "CAT-A",
+                    "price" : 10000
+                },
+                {
+                    "id" : 2,
+                    "category" : "CAT-B",
+                    "price" : 15000
+                }
+            ] 
+        }
     ]
 }
