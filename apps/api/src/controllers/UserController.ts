@@ -3,6 +3,7 @@ import prisma from "@/prisma"
 import { referralGenerator } from "@/lib/referralGenerator"
 import { comparePassword, hashPassword } from "@/lib/hashPassword"
 import { jwtCreate, jwtVerify } from "@/lib/JWT"
+import fs from "fs"
 
 export const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -230,6 +231,69 @@ export const userKeepLogin = async (req: Request, res: Response, next: NextFunct
             message: "Get user who is login success",
             data: isLogin
         })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const deleteImageUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenDecoded: any = req.headers?.authorization
+        const payload: any = await jwtVerify(tokenDecoded)
+
+        const imagesToDelete = await prisma.user.findUnique({
+            where: {
+                id: payload.id
+            },
+            select: {
+                image: true
+            }
+        })
+
+        fs.rmSync(`public/image/${imagesToDelete?.image}`)
+        await prisma.user.update({
+            where: {
+                id: payload.id
+            },
+            data: {
+                image: "defaultUser.jpg"
+            }
+        })
+
+        res.status(200).send({
+            error: false,
+            message: "Delete image success",
+            data: null
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const saveImageUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.files) {
+            const filesArray = Array.isArray(req.files) ? req.files : req.files.kelompokasik
+            const tokenDecoded: any = req.headers?.authorization
+            const payload: any = await jwtVerify(tokenDecoded)
+
+            console.log(payload, filesArray[0].filename)
+
+            await prisma.user.update({
+                where: {
+                    id: payload.id
+                },
+                data: {
+                    image: filesArray[0].filename
+                }
+            })
+
+            res.status(200).send({
+                error: false,
+                message: "Upload new image success",
+                data: null
+            })
+        }
     } catch (error) {
         next(error)
     }
