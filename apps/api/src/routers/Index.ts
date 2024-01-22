@@ -2,6 +2,7 @@ import express, { Router } from "express"
 
 const router = Router()
 router.use(express.json())
+router.use('*/image', express.static('public/image'))
 
 import AdminRouter from "./AdminRouter"
 import UserRouter from "./UserRouter"

@@ -18,6 +18,7 @@ export default function Page() {
     const dispatch = useDispatch()
     const dataUser = useSelector((state) => state.user)
     useQuery({
+        queryKey: ["User Keep Login"],
         queryFn: async () => {
             const { value } = await getCookies()
             if (value != null) {
@@ -30,7 +31,6 @@ export default function Page() {
             }
         }
     })
-
     const onLogout = async () => {
         await removeCookies()
         dispatch(setUser(null))
