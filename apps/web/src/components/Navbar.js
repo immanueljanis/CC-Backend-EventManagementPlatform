@@ -9,14 +9,21 @@ import { getCookies, removeCookies } from "@/lib/cookies";
 import { axiosInstance } from "@/lib/axiosInstance";
 import { setUser } from "@/redux/slice/userSlice";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import path from "path";
 
-export default function Page() {
+export default function Page({children}) {
     // const [products, setProducts] = useState([]);
+
+   
     const [search, setSearch] = useState('');
     const [searchText] = useDebounce(search, 1000)
     const [dataSearch, setDataSearch] = useState([]);
     const dispatch = useDispatch()
     const dataUser = useSelector((state) => state.user)
+    const pathName = usePathname()
+    console.log(pathName)
+
     useQuery({
         queryFn: async () => {
             const { value } = await getCookies()
@@ -35,7 +42,7 @@ export default function Page() {
         await removeCookies()
         dispatch(setUser(null))
     }
-
+    
     // const getCookies = async () => {
     //     try {
     //         const { value } = await getCookies()
@@ -63,7 +70,10 @@ export default function Page() {
     // useEffect(() => {
     //     getProducts();
     // }, [searchText])
-
+    const adminPath = ["/admin", "/admin/login", "/admin/event", "/organizer"]
+    if(adminPath.includes(pathName)) {
+        return (<>{children}</>)
+    }
     return (
         <div className="flex flex-col text-white">
             <div className="flex justify-end items-end gap-3 bg-blue-800">

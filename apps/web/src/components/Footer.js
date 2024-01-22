@@ -1,4 +1,11 @@
-export default function Page(){
+'use client'
+import { usePathname } from "next/navigation"
+
+export default function Page({children}){
+  const pathName = usePathname()
+  const adminPath = ["/admin", "/admin/login", "/admin/event","/organizer"]
+  if(adminPath.includes(pathName)) return (<>{children}</>)
+
   return (
   <footer className="footer p-10 bg-blue-950 text-neutral-content">
 <aside>
