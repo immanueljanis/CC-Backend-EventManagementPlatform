@@ -40,7 +40,7 @@ export const createOrganizer = async (req: Request, res: Response, next: NextFun
                 phone_number,
                 address,
                 referral_code: referralGenerator(),
-                image,
+                image: "testimage",
                 role: "organizer"
             }
         })
@@ -160,29 +160,35 @@ export const deleteOrganizerById = async (req: Request, res: Response, next: Nex
 export const organizerLogin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body
-
         const organizer = await prisma.user.findFirst({
             where: {
-                email
+                AND: [
+                    { email: email },
+                    { role: "organizer" }
+                ]
             }
         })
-
         if (!organizer) throw ("Email not found")
 
         const validatePassword = await comparePassword(password, organizer?.password)
         if (!validatePassword) throw ("Password doesnt match")
 
-        const organizerLoginToken = await jwtCreate({ id: organizer.id, role: organizer.role })
+        const userLoginToken = await jwtCreate({ id: organizer.id, role: organizer.role })
 
         res.status(200).send({
             error: false,
             message: "Login success",
             data: {
                 email: organizer.email,
-                token: organizerLoginToken
+                name: organizer.name,
+                token: userLoginToken
             }
         })
     } catch (error) {
-        next(error)
+        res.status(500).send({
+            error: true,
+            message: error,
+            data: null
+        })
     }
 }

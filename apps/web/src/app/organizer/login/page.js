@@ -1,35 +1,36 @@
 'use client'
-
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import { loginSchema } from "../../lib/yupSchema"
-import Link from "next/link";
-import Input from "../../components/Input"
-import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "../../lib/axiosInstance"
-import { setCookies } from "../../lib/cookies"
-
-import { setUser } from "@/redux/slice/userSlice";
+import { Formik, Form, Field, ErrorMessage } from "formik"
+import Link from "next/link"
 import { useDispatch } from "react-redux"
-import { useRouter } from "next/navigation";
+import { setUser } from "@/redux/slice/userSlice"
+import { useRouter } from "next/navigation"
+import { useMutation } from "@tanstack/react-query"
 
-export default function Page() {
+import { loginSchema } from "../../../lib/yupSchema"
+import Input from "../../../components/Input"
+import { axiosInstance } from "../../../lib/axiosInstance"
+import { setCookies } from "../../../lib/cookies"
+
+export default function OrganizerLogin() {
     const dispatch = useDispatch()
     const router = useRouter()
 
     const { mutate } = useMutation({
         mutationFn: async ({ email, password }) => {
-            const res = await axiosInstance.post("user/login", { email, password })
+            const res = await axiosInstance.post("organizer/login", { email, password })
             return res
         },
 
         onSuccess: ({ data }) => {
-            alert("Login Success")
+            alert("Login success")
             dispatch(setUser({
                 email: data.data.email,
                 name: data.data.name
             }))
+
             setCookies(data.data.token)
-            router.push("/")
+
+            router.push("/organizer")
         },
 
         onError: (error) => {
@@ -40,11 +41,10 @@ export default function Page() {
     return (
         <div className="relative flex flex-col items-center justify-center h-screen overflow-hidden">
             <div className="w-full p-6 bg-white border-t-4 border-blue-950 rounded-md shadow-md border-top lg:max-w-lg">
-                <h1 className="text-3xl font-semibold text-center text-blue-950">Login User</h1>
+                <h1 className="text-3xl font-semibold text-center text-blue-950">Login Organizer</h1>
                 <Formik initialValues={{ email: "", password: "" }} validationSchema={loginSchema}
                     onSubmit={async (values) => {
                         const { email, password } = values
-
                         await mutate({ email, password })
                     }}>
                     {({ dirty, isValid }) => (

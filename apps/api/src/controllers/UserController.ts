@@ -3,6 +3,7 @@ import prisma from "@/prisma"
 import { referralGenerator } from "@/lib/referralGenerator"
 import { comparePassword, hashPassword } from "@/lib/hashPassword"
 import { jwtCreate, jwtVerify } from "@/lib/JWT"
+import fs from "fs"
 
 export const getAllUser = async (req: Request, res: Response) => {
     try {
@@ -40,7 +41,7 @@ export const createUser = async (req: Request, res: Response) => {
                 phone_number,
                 address,
                 referral_code: referralGenerator(),
-                image
+                image: "testing.jpg"
             }
         })
 
@@ -103,7 +104,9 @@ export const getUserById = async (req: Request, res: Response) => {
 export const updateUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const { email, name, password, phone_number, address, image } = req.body
+        const { email, name, password, phone_number, address } = req.body
+
+        let newPassword: string = ""
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -112,6 +115,11 @@ export const updateUserById = async (req: Request, res: Response) => {
         })
 
         if (!existingUser) throw ("User id not found")
+        if (!password) {
+            newPassword = existingUser.password
+        } else {
+            newPassword = await hashPassword(password)
+        }
 
         const updatedUser = await prisma.user.update({
             where: {
@@ -120,10 +128,9 @@ export const updateUserById = async (req: Request, res: Response) => {
             data: {
                 email: email || existingUser?.email,
                 name: name || existingUser?.name,
-                password: await hashPassword(password) || existingUser?.password,
+                password: newPassword,
                 phone_number: phone_number || existingUser?.phone_number,
-                address: address || existingUser?.address,
-                image: image || existingUser?.image,
+                address: address || existingUser?.address
             }
         })
 
@@ -135,8 +142,7 @@ export const updateUserById = async (req: Request, res: Response) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 phone_number: updatedUser.phone_number,
-                address: updatedUser.address,
-                image: updatedUser.image
+                address: updatedUser.address
             }
         })
     } catch (error: any) {
@@ -178,7 +184,10 @@ export const userLogin = async (req: Request, res: Response) => {
 
         const admin = await prisma.user.findFirst({
             where: {
-                email: email
+                AND: [
+                    { email: email },
+                    { role: "user" }
+                ]
             }
         })
         if (!admin) throw ("Email not found")
@@ -200,7 +209,7 @@ export const userLogin = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).send({
             error: true,
-            message: "Login failed",
+            message: error,
             data: null
         })
     }
@@ -222,6 +231,69 @@ export const userKeepLogin = async (req: Request, res: Response, next: NextFunct
             message: "Get user who is login success",
             data: isLogin
         })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const deleteImageUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenDecoded: any = req.headers?.authorization
+        const payload: any = await jwtVerify(tokenDecoded)
+
+        const imagesToDelete = await prisma.user.findUnique({
+            where: {
+                id: payload.id
+            },
+            select: {
+                image: true
+            }
+        })
+
+        fs.rmSync(`public/image/${imagesToDelete?.image}`)
+        await prisma.user.update({
+            where: {
+                id: payload.id
+            },
+            data: {
+                image: "defaultUser.jpg"
+            }
+        })
+
+        res.status(200).send({
+            error: false,
+            message: "Delete image success",
+            data: null
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const saveImageUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (req.files) {
+            const filesArray = Array.isArray(req.files) ? req.files : req.files.kelompokasik
+            const tokenDecoded: any = req.headers?.authorization
+            const payload: any = await jwtVerify(tokenDecoded)
+
+            console.log(payload, filesArray[0].filename)
+
+            await prisma.user.update({
+                where: {
+                    id: payload.id
+                },
+                data: {
+                    image: filesArray[0].filename
+                }
+            })
+
+            res.status(200).send({
+                error: false,
+                message: "Upload new image success",
+                data: null
+            })
+        }
     } catch (error) {
         next(error)
     }
