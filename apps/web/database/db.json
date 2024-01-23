@@ -36,12 +36,14 @@
                 {
                     "id" : 1,
                     "category" : "CAT-A",
-                    "price" : 10000
+                    "price" : 10000,
+                    "quota": 4
                 },
                 {
                     "id" : 2,
                     "category" : "CAT-B",
-                    "price" : 15000
+                    "price" : 15000,
+                    "quota": 10
                 }
             ] 
         }
