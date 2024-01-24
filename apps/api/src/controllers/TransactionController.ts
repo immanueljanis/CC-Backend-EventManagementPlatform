@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "@/prisma";
-import { getWhoIsLoginViaJWT } from "@/lib/JWT";
+import { getWhoIsLoginViaJWT, jwtVerify } from "@/lib/JWT";
+import { Prisma } from "@prisma/client";
 
 export const getAlltransaction = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -44,18 +45,125 @@ export const getTransactionByIsLogin = async (req: Request, res: Response, next:
 
 export const createTransaction = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { event_id } = req.params
-        const { price, referral_used } = req.body
+        const { event_id, ticket, totalPrice } = req.body
+        let isCouponExpired = null
+        const payload: any = req.headers.authorization
 
-        const payload = await getWhoIsLoginViaJWT(req)
 
-        await prisma.transaction.create({
-            data: {
-                user_id: payload.id,
-                price,
-                referral_used,
-                event_id
+        // With Coupon
+        if (req.body.coupon) {
+            const { coupon } = req.body
+            isCouponExpired = new Date() > new Date(coupon.exp_date)
+
+            if (!isCouponExpired) {
+                await prisma.$transaction(async (tx) => {
+                    const transaction: any = await tx.transaction.create({
+                        data: {
+                            user_id: payload?.id,
+                            price: totalPrice,
+                            referral_used: coupon?.id,
+                            event_id
+                        }
+                    })
+
+                    await tx.referral_code.update({
+                        where: {
+                            id: coupon.id
+                        },
+                        data: {
+                            used: 1
+                        }
+                    })
+
+                    const oldTicket: any = await tx.event_Ticket.findMany({
+                        where: {
+                            id: {
+                                contains: ticket.id
+                            }
+                        }
+                    })
+
+                    for (const tickets of ticket) {
+                        const oldTicketIndex = oldTicket.findIndex((ot: any) => ot.id === tickets.id);
+
+                        if (oldTicketIndex !== -1) {
+                            const updatedQuota = Math.max(oldTicket[oldTicketIndex].quota - tickets.quota, 0); // Ensure quota doesn't go negative
+
+                            await tx.event_Ticket.updateMany({
+                                where: { id: tickets.id },
+                                data: { quota: updatedQuota }
+                            });
+                        }
+                    }
+
+                    for (const eventTicket of ticket) {
+                        await tx.user_Event_Ticket.create({
+                            data: {
+                                event_ticket_id: eventTicket.id,
+                                user_id: payload.id,
+                                qty: eventTicket.quota,
+                                transaction_id: transaction.id
+                            }
+                        })
+                    }
+                })
+
+                res.status(200).send({
+                    error: false,
+                    message: "Buy ticket success",
+                    data: null
+                })
             }
+        }
+
+        // Without Coupon
+        await prisma.$transaction(async (tx) => {
+            const transaction: any = await tx.transaction.create({
+                data: {
+                    user_id: payload?.id,
+                    price: totalPrice,
+                    referral_used: "",
+                    event_id
+                }
+            })
+
+            const oldTicket: any = await tx.event_Ticket.findMany({
+                where: {
+                    id: {
+                        contains: ticket.id
+                    }
+                }
+            })
+
+            for (const tickets of ticket) {
+                const oldTicketIndex = oldTicket.findIndex((ot: any) => ot.id === tickets.id);
+
+                if (oldTicketIndex !== -1) {
+                    const updatedQuota = Math.max(oldTicket[oldTicketIndex].quota - tickets.quota, 0); // Ensure quota doesn't go negative
+
+                    await tx.event_Ticket.updateMany({
+                        where: { id: tickets.id },
+                        data: { quota: updatedQuota }
+                    });
+                }
+            }
+
+            for (const eventTicket of ticket) {
+                await tx.user_Event_Ticket.create({
+                    data: {
+                        event_ticket_id: eventTicket.id,
+                        user_id: payload.id,
+                        qty: eventTicket.quota,
+                        transaction_id: transaction.id
+                    }
+                })
+            }
+        })
+
+        res.status(200).send({
+            error: false,
+            message: "Buy ticket success",
+            data: null
         })
     } catch (error) {
         next(error)

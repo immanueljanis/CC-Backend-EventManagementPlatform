@@ -298,3 +298,29 @@ export const saveImageUser = async (req: Request, res: Response, next: NextFunct
         next(error)
     }
 }
+
+export const getAllCoupon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenDecoded: any = req.headers?.authorization
+        const isLogin = await prisma.referral_code.findMany({
+            where: {
+                user_id: String(tokenDecoded?.id),
+                used: 0
+            }
+        })
+
+        if (isLogin.length == 0) res.status(404).send({
+            error: false,
+            message: "Get coupon null",
+            data: null
+        })
+
+        res.status(200).send({
+            error: false,
+            message: "Get coupon success",
+            data: isLogin
+        })
+    } catch (error) {
+        next(error)
+    }
+}
