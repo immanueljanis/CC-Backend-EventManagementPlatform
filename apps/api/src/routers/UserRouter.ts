@@ -11,6 +11,8 @@ router.put("/:id", UserController.updateUserById)
 router.post("/", UserController.createUser)
 router.delete("/:id", UserController.deleteUserById)
 
+router.post("/getAllCoupon", tokenVerifyUser, UserController.getAllCoupon)
+
 router.post("/login", UserController.userLogin)
 router.post("/save-image", uploadValidator, UserController.saveImageUser)
 router.post("/delete-image", UserController.deleteImageUser)

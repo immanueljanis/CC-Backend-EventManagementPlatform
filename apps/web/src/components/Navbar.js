@@ -12,17 +12,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import path from "path";
 
-export default function Page({children}) {
+export default function Page({ children }) {
     // const [products, setProducts] = useState([]);
 
-   
+
     const [search, setSearch] = useState('');
     const [searchText] = useDebounce(search, 1000)
     const [dataSearch, setDataSearch] = useState([]);
     const dispatch = useDispatch()
     const dataUser = useSelector((state) => state.user)
     const pathName = usePathname()
-    console.log(pathName)
 
     useQuery({
         queryKey: ["User Keep Login"],
@@ -57,7 +56,7 @@ export default function Page({children}) {
     //     getProducts();
     // }, [searchText])
     const adminPath = ["/admin", "/admin/login", "/admin/event", "/organizer"]
-    if(adminPath.includes(pathName)) {
+    if (adminPath.includes(pathName)) {
         return (<>{children}</>)
     }
     return (

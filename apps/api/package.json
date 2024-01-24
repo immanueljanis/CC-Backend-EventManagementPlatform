@@ -8,7 +8,8 @@
     "build": "tsc",
     "serve": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prisma": "npx prisma"
+    "prisma": "npx prisma",
+    "prismaDev": "dotenv -e .env.development prisma migrate dev"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
