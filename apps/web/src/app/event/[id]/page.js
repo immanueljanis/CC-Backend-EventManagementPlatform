@@ -11,6 +11,7 @@ import Image from "next/image";
 import { imagePath } from "../../../lib/path"
 import Modal from "../../../components/Modal"
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
     const params = useParams()
@@ -98,11 +99,11 @@ export default function Page() {
     if (!data) return (<p>404 Not Found</p>)
     return (
         <div className=" h-full border">
-            <div className="text-xs breadcrumbs px-9">
+            <div className="text-xs text-blue-900 breadcrumbs px-9">
                 <ul>
-                    <li><a>Home</a></li>
-                    <li><a>Event</a></li>
-                    <li>Event Name</li>
+                    <li><Link href={"/"}>Home</Link></li>
+                    <li><Link href={"/event"}>Event</Link></li>
+                    <li><Link href={`/event/${params.id}`}>{data?.event?.title}</Link></li>
                 </ul>
             </div>
             <div className="grid grid-cols-5 card-body">

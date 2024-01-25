@@ -25,18 +25,31 @@ export const getAlltransaction = async (req: Request, res: Response, next: NextF
 
 export const getTransactionByIsLogin = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const isLogin = await getWhoIsLoginViaJWT(req)
+        const payload: any = req.headers.authorization
 
         const data = await prisma.transaction.findMany({
             where: {
-                user_id: isLogin.id
+                user_id: payload.id
+            },
+            include: {
+                event: true
+            }
+        })
+
+        const image = await prisma.event_Image.findFirst({
+            where: {
+                event_id: data[0]?.event?.id
+            },
+            select: {
+                filename: true
             }
         })
 
         res.status(200).send({
             error: false,
             message: "Get data success",
-            data
+            data,
+            image
         })
     } catch (error) {
         next(error)

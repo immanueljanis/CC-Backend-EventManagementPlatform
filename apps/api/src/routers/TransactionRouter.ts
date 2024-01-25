@@ -6,7 +6,7 @@ const router: Router = express.Router()
 
 router.get("/", tokenVerifyTransaction, TransactionController.getAlltransaction)
 router.get("/:id", TransactionController.getTransactionById)
-router.get("/user", TransactionController.getTransactionByIsLogin)
+router.post("/user", tokenVerifyUser, TransactionController.getTransactionByIsLogin)
 router.post("/", tokenVerifyUser, TransactionController.createTransaction)
 
 export default router
