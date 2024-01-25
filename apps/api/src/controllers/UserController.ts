@@ -31,29 +31,80 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { email, name, password, phone_number, address, image } = req.body
+        const { email, name, password, phone_number, address, referral_code } = req.body
 
-        const data = await prisma.user.create({
-            data: {
-                email,
-                name,
-                password: await hashPassword(password),
-                phone_number,
-                address,
-                referral_code: referralGenerator(),
-                image: "testing.jpg"
-            }
-        })
+        if (!referral_code) {
+            const data = await prisma.user.create({
+                data: {
+                    email,
+                    name,
+                    password: await hashPassword(password),
+                    phone_number,
+                    address,
+                    referral_code: referralGenerator(),
+                    image: "defaultUser.jpg"
+                }
+            })
 
-        return res.status(200).send({
-            error: false,
-            message: "Create user success",
-            data: {
-                email: data.email,
-                name: data.name,
-                referral_code: data.referral_code
-            }
-        })
+            return res.status(200).send({
+                error: false,
+                message: "Create user success",
+                data: {
+                    email: data.email,
+                    name: data.name,
+                    referral_code: data.referral_code
+                }
+            })
+        } else {
+            await prisma.$transaction(async (tx) => {
+                const data = await tx.user.create({
+                    data: {
+                        email,
+                        name,
+                        password: await hashPassword(password),
+                        phone_number,
+                        address,
+                        referral_code: referralGenerator(),
+                        image: "defaultUser.jpg"
+                    }
+                })
+
+                const findReferencesCoupon: any = await tx.user.findFirst({
+                    where: {
+                        referral_code: referral_code
+                    },
+                    select: {
+                        id: true
+                    }
+                })
+
+                if (!findReferencesCoupon) throw ("Something error with your referral")
+
+                await tx.referral_code.createMany({
+                    data: [
+                        {
+                            user_id: data?.id,
+                            price: 10,
+                            references_id: findReferencesCoupon?.id,
+                            exp_date: new Date(Date.now() + (8.64e+7 * 90)).toISOString()
+                        },
+                        {
+                            user_id: findReferencesCoupon?.id,
+                            price: 10000,
+                            references_id: data?.id,
+                            exp_date: new Date(Date.now() + (8.64e+7 * 90)).toISOString()
+                        }
+                    ]
+                })
+
+            })
+
+            return res.status(200).send({
+                error: false,
+                message: "Create user success",
+                data: null
+            })
+        }
     } catch (error) {
         return res.status(500).send({
             error: false,
@@ -294,6 +345,32 @@ export const saveImageUser = async (req: Request, res: Response, next: NextFunct
                 data: null
             })
         }
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getAllCoupon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const tokenDecoded: any = req.headers?.authorization
+        const isLogin = await prisma.referral_code.findMany({
+            where: {
+                user_id: String(tokenDecoded?.id),
+                used: 0
+            }
+        })
+
+        if (isLogin.length == 0) res.status(404).send({
+            error: false,
+            message: "Get coupon null",
+            data: null
+        })
+
+        res.status(200).send({
+            error: false,
+            message: "Get coupon success",
+            data: isLogin
+        })
     } catch (error) {
         next(error)
     }

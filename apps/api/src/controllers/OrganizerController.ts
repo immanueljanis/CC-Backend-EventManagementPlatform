@@ -30,7 +30,7 @@ export const getAllOrganizer = async (req: Request, res: Response, next: NextFun
 
 export const createOrganizer = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { email, name, password, phone_number, address, image } = req.body
+        const { email, name, password, phone_number, address } = req.body
 
         const organizer = await prisma.user.create({
             data: {
@@ -40,7 +40,7 @@ export const createOrganizer = async (req: Request, res: Response, next: NextFun
                 phone_number,
                 address,
                 referral_code: referralGenerator(),
-                image: "testimage",
+                image: "defaultUser.jpg",
                 role: "organizer"
             }
         })

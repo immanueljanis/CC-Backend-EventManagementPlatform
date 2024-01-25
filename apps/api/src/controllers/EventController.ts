@@ -89,7 +89,23 @@ export const getEventById = async (req: Request, res: Response) => {
                 Event_Category: true,
                 Event_Image: true,
                 Event_Ticket: true,
-                Event_Rating: true
+                Event_Rating: {
+                    include: {
+                        users: {
+                            select: {
+                                name: true,
+                                image: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        const organizer = await prisma.user.findUnique({
+            where: {
+                id: data?.organizer_id,
+                role: "organizer"
             }
         })
 
@@ -102,12 +118,15 @@ export const getEventById = async (req: Request, res: Response) => {
         res.status(200).send({
             error: false,
             message: "Get data success",
-            data
+            data: {
+                event: data,
+                organizer
+            }
         })
     } catch (error) {
         res.status(500).send({
             error: true,
-            message: "Get data failed",
+            message: error,
             data: null
         })
     }

@@ -63,7 +63,7 @@ model Category {
 }
 
 model Event_Image {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   event    Event  @relation(fields: [event_id], references: [id])
   event_id String
@@ -74,6 +74,8 @@ model Event_Image {
 enum Event_Status {
   pending
   approved
+  done
+  decline
 }
 
 model Event_Category {
@@ -150,6 +152,8 @@ model Referral_code {
 
   references_id String
   references    User   @relation(fields: [references_id], references: [id], name: "userWhoUseReferral")
+
+  used Int @default(0)
 
   exp_date DateTime
 }

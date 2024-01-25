@@ -12,10 +12,10 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import path from "path";
 
-export default function Page({children}) {
+export default function Page({ children }) {
     // const [products, setProducts] = useState([]);
 
-   
+
     const [search, setSearch] = useState('');
     const [searchText] = useDebounce(search, 1000)
     const [dataSearch, setDataSearch] = useState([]);
@@ -23,8 +23,6 @@ export default function Page({children}) {
     const dataUser = useSelector((state) => state.user)
     const pathName = usePathname()
     const params = useParams()
-    console.log(`${params.slug}`)
-    console.log(pathName)
 
     useQuery({
         queryKey: ["User Keep Login"],
@@ -109,13 +107,13 @@ export default function Page({children}) {
                 <div className="navbar-end flex gap-3">
                     <div className="navbar-center hidden lg:flex">
                         <ul className="menu menu-horizontal px-1">
-                            <li><a>Event</a></li>
+                            <li><Link href={"/event"}>Event</Link></li>
 
                         </ul>
                     </div>
                     {dataUser?.user?.data?.data?.name ?
                         <>
-                            <a className="btn w-24">{dataUser.user.data.data.name}</a>
+                            <Link href={"/profile"} className="btn w-24">{dataUser.user.data.data.name}</Link>
                             <button className="btn w-24" onClick={() => onLogout()}>Logout</button>
                         </>
                         :
