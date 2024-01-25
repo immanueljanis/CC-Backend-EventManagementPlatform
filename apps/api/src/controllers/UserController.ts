@@ -31,29 +31,80 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { email, name, password, phone_number, address } = req.body
+        const { email, name, password, phone_number, address, referral_code } = req.body
 
-        const data = await prisma.user.create({
-            data: {
-                email,
-                name,
-                password: await hashPassword(password),
-                phone_number,
-                address,
-                referral_code: referralGenerator(),
-                image: "defaultUser.jpg"
-            }
-        })
+        if (!referral_code) {
+            const data = await prisma.user.create({
+                data: {
+                    email,
+                    name,
+                    password: await hashPassword(password),
+                    phone_number,
+                    address,
+                    referral_code: referralGenerator(),
+                    image: "defaultUser.jpg"
+                }
+            })
 
-        return res.status(200).send({
-            error: false,
-            message: "Create user success",
-            data: {
-                email: data.email,
-                name: data.name,
-                referral_code: data.referral_code
-            }
-        })
+            return res.status(200).send({
+                error: false,
+                message: "Create user success",
+                data: {
+                    email: data.email,
+                    name: data.name,
+                    referral_code: data.referral_code
+                }
+            })
+        } else {
+            await prisma.$transaction(async (tx) => {
+                const data = await tx.user.create({
+                    data: {
+                        email,
+                        name,
+                        password: await hashPassword(password),
+                        phone_number,
+                        address,
+                        referral_code: referralGenerator(),
+                        image: "defaultUser.jpg"
+                    }
+                })
+
+                const findReferencesCoupon: any = await tx.user.findFirst({
+                    where: {
+                        referral_code: referral_code
+                    },
+                    select: {
+                        id: true
+                    }
+                })
+
+                if (!findReferencesCoupon) throw ("Something error with your referral")
+
+                await tx.referral_code.createMany({
+                    data: [
+                        {
+                            user_id: data?.id,
+                            price: 10,
+                            references_id: findReferencesCoupon?.id,
+                            exp_date: new Date(Date.now() + (8.64e+7 * 90)).toISOString()
+                        },
+                        {
+                            user_id: findReferencesCoupon?.id,
+                            price: 10000,
+                            references_id: data?.id,
+                            exp_date: new Date(Date.now() + (8.64e+7 * 90)).toISOString()
+                        }
+                    ]
+                })
+
+            })
+
+            return res.status(200).send({
+                error: false,
+                message: "Create user success",
+                data: null
+            })
+        }
     } catch (error) {
         return res.status(500).send({
             error: false,

@@ -127,51 +127,51 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
                     data: null
                 })
             }
-        }
-
-        // Without Coupon
-        await prisma.$transaction(async (tx) => {
-            const transaction: any = await tx.transaction.create({
-                data: {
-                    user_id: payload?.id,
-                    price: totalPrice,
-                    referral_used: "",
-                    event_id
-                }
-            })
-
-            const oldTicket: any = await tx.event_Ticket.findMany({
-                where: {
-                    id: {
-                        contains: ticket.id
-                    }
-                }
-            })
-
-            for (const tickets of ticket) {
-                const oldTicketIndex = oldTicket.findIndex((ot: any) => ot.id === tickets.id);
-
-                if (oldTicketIndex !== -1) {
-                    const updatedQuota = Math.max(oldTicket[oldTicketIndex].quota - tickets.quota, 0); // Ensure quota doesn't go negative
-
-                    await tx.event_Ticket.updateMany({
-                        where: { id: tickets.id },
-                        data: { quota: updatedQuota }
-                    });
-                }
-            }
-
-            for (const eventTicket of ticket) {
-                await tx.user_Event_Ticket.create({
+        } else {
+            // Without Coupon
+            await prisma.$transaction(async (tx) => {
+                const transaction: any = await tx.transaction.create({
                     data: {
-                        event_ticket_id: eventTicket.id,
-                        user_id: payload.id,
-                        qty: eventTicket.quota,
-                        transaction_id: transaction.id
+                        user_id: payload?.id,
+                        price: totalPrice,
+                        referral_used: "",
+                        event_id
                     }
                 })
-            }
-        })
+
+                const oldTicket: any = await tx.event_Ticket.findMany({
+                    where: {
+                        id: {
+                            contains: ticket.id
+                        }
+                    }
+                })
+
+                for (const tickets of ticket) {
+                    const oldTicketIndex = oldTicket.findIndex((ot: any) => ot.id === tickets.id);
+
+                    if (oldTicketIndex !== -1) {
+                        const updatedQuota = Math.max(oldTicket[oldTicketIndex].quota - tickets.quota, 0); // Ensure quota doesn't go negative
+
+                        await tx.event_Ticket.updateMany({
+                            where: { id: tickets.id },
+                            data: { quota: updatedQuota }
+                        });
+                    }
+                }
+
+                for (const eventTicket of ticket) {
+                    await tx.user_Event_Ticket.create({
+                        data: {
+                            event_ticket_id: eventTicket.id,
+                            user_id: payload.id,
+                            qty: eventTicket.quota,
+                            transaction_id: transaction.id
+                        }
+                    })
+                }
+            })
+        }
 
         res.status(200).send({
             error: false,
