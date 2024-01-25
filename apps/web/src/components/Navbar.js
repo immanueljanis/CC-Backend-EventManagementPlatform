@@ -106,13 +106,13 @@ export default function Page({ children }) {
                 <div className="navbar-end flex gap-3">
                     <div className="navbar-center hidden lg:flex">
                         <ul className="menu menu-horizontal px-1">
-                            <li><a>Event</a></li>
+                            <li><Link href={"/event"}>Event</Link></li>
 
                         </ul>
                     </div>
                     {dataUser?.user?.data?.data?.name ?
                         <>
-                            <a className="btn w-24">{dataUser.user.data.data.name}</a>
+                            <Link href={"/profile"} className="btn w-24">{dataUser.user.data.data.name}</Link>
                             <button className="btn w-24" onClick={() => onLogout()}>Logout</button>
                         </>
                         :
