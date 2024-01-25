@@ -1,9 +1,12 @@
 'use client'
 import { usePathname } from "next/navigation"
+import { useParams } from "next/navigation"
 
 export default function Page({children}){
+  const params = useParams()
   const pathName = usePathname()
-  const adminPath = ["/admin", "/admin/login", "/admin/event","/organizer"]
+  console.log(pathName)
+  const adminPath = ["/admin","/admin/login", "/admin/event","/organizer","/admin/users","/admin/category","/organizer/event","/organizer/login",`/organizer/event/${params.slug}`,`/admin/event/${params.slug}`]
   if(adminPath.includes(pathName)) return (<>{children}</>)
 
   return (

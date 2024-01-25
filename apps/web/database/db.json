@@ -47,5 +47,117 @@
                 }
             ] 
         }
+    ],
+    "events" : [
+        {
+            "id" : 1,
+            "tittle" : "Polarisasi Musikal",
+            "organizerName" : "DA LOPEZ ENTERTAINMENT",
+            "location" : "Bogor",
+            "date" : "2024-12-30",
+            "status" : "pending",
+            "category" : "Show",
+            "url" : "event5.webp",
+            "tickets" : [
+                {
+                    "id" : 1,
+                    "category" : "CAT-A",
+                    "price" : 20000,
+                    "quota": 4
+                },
+                {
+                    "id" : 2,
+                    "category" : "CAT-B",
+                    "price" : 25000,
+                    "quota": 10
+                }
+            ] 
+        },
+        {
+            "id" : 2,
+            "tittle" : "INCUBUS ASIA TOUR 2024",
+            "organizerName" : "CK Star Entertainment",
+            "location" : "Tennis Indoor Senayan",
+            "date" : "2024-04-23",
+            "status" : "approved",
+            "category": "Sports",
+            "url" : "event.webp",
+            "tickets" : [
+                {
+                    "id" : 1,
+                    "category" : "CAT-A",
+                    "price" : 30000,
+                    "quota": 4
+                },
+                {
+                    "id" : 2,
+                    "category" : "CAT-B",
+                    "price" : 45000,
+                    "quota": 10
+                }
+            ] 
+        },
+        {
+            "id" : 3,
+            "tittle" : "TOSCA PENSI XXVI",
+            "organizerName" : "SMA PLus Pembangunan Jaya",
+            "location" : "SMA Plus Pembangunan Jaya, Banten",
+            "date" : "2024-03-24",
+            "status" : "done",
+            "category" : "Concert",
+            "url" : "event7.webp",
+            "tickets" : [
+                {
+                    "id" : 1,
+                    "category" : "CAT-A",
+                    "price" : 10000,
+                    "quota": 4
+                },
+                {
+                    "id" : 2,
+                    "category" : "CAT-B",
+                    "price" : 15000,
+                    "quota": 10
+                }
+            ] 
+        }
+    ],
+    "users" : [
+        {
+            "id" : 1,
+            "name" : "kiki",
+            "email" : "kikitmoky@gmail.com",
+            "phone_number" : "081385536326",
+            "address" : "Kota Bogor",
+            "role" : "user",
+            "referral_code" : "kiki123"
+        },
+        {
+            "id" : 2,
+            "name" : "immanuel",
+            "email" : "nueljannis@gmail.com",
+            "phone_number" : "085777007177",
+            "address" : "Cisauk",
+            "role" : "organizer",
+            "referral_code" : "nuel123"
+        }
+    ],
+    "category" :[
+        {
+            "id" : 1,
+            "name" : "Concert"
+        },
+        {
+            "id" : 2,
+            "name" : "Workshop"
+        },
+        {
+            "id" : 3,
+            "name" : "Talk Show"
+        },
+        {
+            "id" : 4,
+            "name" : "Festival"
+        }
     ]
 }

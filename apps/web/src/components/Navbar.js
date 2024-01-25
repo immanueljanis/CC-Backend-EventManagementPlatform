@@ -9,7 +9,7 @@ import { getCookies, removeCookies } from "@/lib/cookies";
 import { axiosInstance } from "@/lib/axiosInstance";
 import { setUser } from "@/redux/slice/userSlice";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import path from "path";
 
 export default function Page({children}) {
@@ -22,6 +22,8 @@ export default function Page({children}) {
     const dispatch = useDispatch()
     const dataUser = useSelector((state) => state.user)
     const pathName = usePathname()
+    const params = useParams()
+    console.log(`${params.slug}`)
     console.log(pathName)
 
     useQuery({
@@ -70,7 +72,7 @@ export default function Page({children}) {
     // useEffect(() => {
     //     getProducts();
     // }, [searchText])
-    const adminPath = ["/admin", "/admin/login", "/admin/event", "/organizer"]
+    const adminPath = ["/admin","/organizer/login","/admin/login", "/admin/event", "/organizer","/admin/users","/admin/category","/organizer/event", `/organizer/event/${params.slug}`,`/admin/event/${params.slug}`]
     if(adminPath.includes(pathName)) {
         return (<>{children}</>)
     }
