@@ -63,7 +63,7 @@ export default function Page() {
                                 </Field>
                                 <ErrorMessage name="password" />
                             </div>
-                            <div className="pt-4">
+                            <div className="pt-5">
                                 <button disabled={!(dirty && isValid)} type="submit" className="btn btn-block bg-blue-950 text-white">Login</button>
                             </div>
                         </Form>
