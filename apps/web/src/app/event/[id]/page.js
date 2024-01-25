@@ -13,6 +13,7 @@ import Modal from "../../../components/Modal"
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Review from "../../../components/Review"
+import { getCookies } from "@/lib/cookies";
 
 export default function Page() {
     const params = useParams()

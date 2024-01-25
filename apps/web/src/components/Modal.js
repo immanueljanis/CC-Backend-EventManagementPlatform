@@ -57,10 +57,8 @@ export default function Modal(props) {
             console.log(error)
         }
     })
-
     return (
         <div>
-            {/* Open the modal using document.getElementById('ID').showModal() method */}
             < button className="btn btn-primary w-full" onClick={() => document.getElementById('modalCheckout').showModal()}> Buy Now</button >
             <dialog id="modalCheckout" className="modal">
                 <div className="modal-box bg-white text-black w-full">
