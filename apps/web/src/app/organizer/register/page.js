@@ -1,30 +1,36 @@
 'use client'
 
 import { Formik, Form, Field, ErrorMessage } from "formik"
-import { userRegisterSchema } from "../../lib/yupSchema"
+import { userRegisterSchema } from "../../../lib/yupSchema"
 import Link from "next/link"
-import Input from "../../components/Input"
+import Input from "../../../components/Input"
 import { useMutation } from "@tanstack/react-query"
 import { axiosInstance } from "@/lib/axiosInstance"
+import { useRouter } from "next/navigation"
 
 export default function Page() {
+    const router = useRouter()
 
     const { mutate } = useMutation({
         mutationFn: async ({ email, name, password, phone_number, address }) => {
-            const res = await axiosInstance.post("user", { email, name, password, phone_number, address })
+            const res = await axiosInstance.post("organizer", { email, name, password, phone_number, address })
             return res
         },
 
-        onSuccess: (data) => {
+        onSuccess: () => {
             alert("Register Success")
-            console.log(data.data)
+            router.push("/")
+        },
+
+        onError: (error) => {
+            alert(error.response.data.message)
         }
     })
 
     return (
         <div className="relative flex flex-col items-center justify-center h-screen overflow-hidden">
             <div className="w-full p-6 bg-white border-t-4 rounded-md shadow-md border-top lg:max-w-lg">
-                <h1 className="text-3xl font-semibold text-center text-blue-950">Register User  </h1>
+                <h1 className="text-3xl font-semibold text-center text-blue-950">Register Organizer </h1>
                 <Formik initialValues={{ email: "", name: "", password: "", phone_number: "", address: "" }} validationSchema={userRegisterSchema}
                     onSubmit={async (values) => {
                         const { email, name, password, phone_number, address } = values

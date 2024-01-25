@@ -27,6 +27,7 @@ export default function Page({children}) {
     console.log(pathName)
 
     useQuery({
+        queryKey: ["User Keep Login"],
         queryFn: async () => {
             const { value } = await getCookies()
             if (value != null) {
@@ -39,25 +40,10 @@ export default function Page({children}) {
             }
         }
     })
-
     const onLogout = async () => {
         await removeCookies()
         dispatch(setUser(null))
     }
-    
-    // const getCookies = async () => {
-    //     try {
-    //         const { value } = await getCookies()
-    //         if (value) {
-    //             let res = await axiosInstance.get(`/user/${value}`)
-
-    //             console.log(value, res)
-    //             dispatch(setUser(res))
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
 
     // const getProducts = async () => {
     //     try {
@@ -97,7 +83,7 @@ export default function Page({children}) {
 
                         </ul>
                     </div>
-                    <a className="btn btn-ghost text-xl">Mendadak Event</a>
+                    <Link href={"/"} className="btn btn-ghost text-xl">Mendadak Event</Link>
                 </div>
                 <div className="form-control">
                     <input
@@ -135,6 +121,7 @@ export default function Page({children}) {
                         :
                         <>
                             <Link href={"/register"} className="btn w-24">Register</Link>
+                            <Link href={"/login"} className="btn w-24">Login</Link>
                         </>
                     }
                 </div>

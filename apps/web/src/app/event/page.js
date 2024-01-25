@@ -9,14 +9,14 @@ import { formatRupiah } from "@/lib/formatRupiah";
 
 const gambar = [
     {
-        url : '/images/event.webp',
-        title : 'Incubus Asia Tour 2024',
-        date : '2024-01-01',
-        price : '950000',
-        publisher : 'CK Star Entertaiment',
-        clock : '20.00 - 24.00',
-        description : 'INI EVENT TERBAIK',
-        logo : '/images/logoincubus.webp'
+        url: '/images/event.webp',
+        title: 'Incubus Asia Tour 2024',
+        date: '2024-01-01',
+        price: '950000',
+        publisher: 'CK Star Entertaiment',
+        clock: '20.00 - 24.00',
+        description: 'INI EVENT TERBAIK',
+        logo: '/images/logoincubus.webp'
     }
 ]
 
@@ -85,10 +85,10 @@ export default function Page(){
         setBuy(tempBuy)
     }
 
-    const fetchData = async() => {
+    const fetchData = async () => {
         try {
-            const res = await axios.get('http://localhost:8001/event/1')
-           
+           const res = await axios.get('http://localhost:8001/event/1')
+ 
             setData(res.data)
             setTabOpen(res.data.description)
         } catch (error) {
@@ -101,14 +101,13 @@ export default function Page(){
     console.log()
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         fetchData()
-    },[])
+    }, [])
     return (
 
 
         <container className="">
-            {console.log(buy)}
             {gambar.map((item, index) =>{
                 return (
                     <>
@@ -186,10 +185,11 @@ export default function Page(){
                                                         )
                                                     })
                                                 :
-                                                    null
+                                                null
                                         }
                                     </div>
                                 </div>
+
                                 <div className="flex ml-card col-span-2 bg-base-100 shadow-xl">
                                     <div className="card w-full h-fit bg-base-100 shadow-xl">
                                             <div className="card-body">
@@ -215,13 +215,15 @@ export default function Page(){
                                                     </div>
                                             </div>
                                     </div>        
+
                                 </div>
+                            </div>
                         </div>
                     </div>
                     </>
                 )
             })}
-            
+
         </container>
     )
 }

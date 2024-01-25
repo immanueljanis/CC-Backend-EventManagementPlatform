@@ -10,14 +10,14 @@ import { setCookies } from "../../lib/cookies"
 
 import { setUser } from "@/redux/slice/userSlice";
 import { useDispatch } from "react-redux"
-import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
     const dispatch = useDispatch()
+    const router = useRouter()
 
     const { mutate } = useMutation({
         mutationFn: async ({ email, password }) => {
-            // console.log(email, password)
             const res = await axiosInstance.post("user/login", { email, password })
             return res
         },
@@ -29,10 +29,11 @@ export default function Page() {
                 name: data.data.name
             }))
             setCookies(data.data.token)
+            router.push("/")
         },
 
         onError: (error) => {
-            console.log(error)
+            alert(error.response.data.message)
         }
     })
 
@@ -58,9 +59,9 @@ export default function Page() {
                             </div>
 
                             <div>
-                                <Field name="password" type="password">
+                                <Field name="password">
                                     {({ field }) => (
-                                        <Input field={field} label="Password" placeholder="Password" />
+                                        <Input field={field} type="password" label="Password" placeholder="Password" />
                                     )}
                                 </Field>
                                 <ErrorMessage name="password" />
