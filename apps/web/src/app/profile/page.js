@@ -10,6 +10,7 @@ import { getCookies } from "@/lib/cookies"
 import { useState } from "react"
 import Image from "next/image"
 import { imagePath } from "../../lib/path"
+import Table from "../../components/Table"
 
 export default function profileUser() {
     const { user } = useSelector((state) => state.user)
@@ -88,79 +89,85 @@ export default function profileUser() {
 
     if (!user?.data?.data) return (<><h1>You need to login first</h1></>)
     return (
-        <div className="flex w-full justify-center p-8 gap-8 h-96">
-            <div className="w-96">
-                <div className="avatar flex">
-                    <div className="w-full mx-16 my-6 items-center justify-center rounded-full">
-                        <Image src={`${imagePath}/${user?.data?.data.image}`} width={500} height={500} priority alt="imageUser" />
+        <div>
+            <div className="flex w-full justify-center p-8 gap-8 h-96">
+                <div className="w-96">
+                    <div className="avatar flex">
+                        <div className="w-full mx-16 my-6 items-center justify-center rounded-full">
+                            <Image src={`${imagePath}/${user?.data?.data.image}`} width={500} height={500} priority alt="imageUser" />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col mx-4 gap-2 text-white">
+                        <input type="file" className="file-input w-full max-w-xs bg-blue-950" onChange={handleFileChange} />
+                        {selectedFile && (
+                            <button className="btn bg-blue-950" onClick={() => saveImage.mutate()}>Upload New Image</button>
+                        )}
+                        <button className="btn bg-gray-900" onClick={() => deleteImage.mutate()}>Delete Image</button>
                     </div>
                 </div>
 
-                <div className="flex flex-col mx-4 gap-2 text-white">
-                    <input type="file" className="file-input w-full max-w-xs bg-blue-950" onChange={handleFileChange} />
-                    {selectedFile && (
-                        <button className="btn bg-blue-950" onClick={() => saveImage.mutate()}>Upload New Image</button>
-                    )}
-                    <button className="btn bg-gray-900" onClick={() => deleteImage.mutate()}>Delete Image</button>
+                <div className="w-full h-full">
+                    <Formik initialValues={{ name: user?.data?.data.name, email: user?.data?.data.email, phone_number: user?.data?.data.phone_number, password: "", address: user?.data?.data.address, referral_code: user?.data?.data?.referral_code }} validationSchema={userSchema}
+                        onSubmit={async (values) => {
+                            await mutate(values)
+                        }}>
+                        <Form>
+                            <div className="flex justify-center gap-24">
+                                <div>
+                                    <Field name="name" type="text">
+                                        {({ field }) => (
+                                            <Input field={field} label="Name" placeholder="Enter Your Username" />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="name" />
+
+                                    <Field name="email" type="text">
+                                        {({ field }) => (
+                                            <Input field={field} label="Email" placeholder="Enter Your Email" />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="email" />
+
+                                    <Field name="phone_number" type="text">
+                                        {({ field }) => (
+                                            <Input field={field} label="Phone Number" placeholder="Enter Your Phone Number" />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="phone_number" />
+                                </div>
+
+                                <div>
+                                    <Field name="address" type="text">
+                                        {({ field }) => (
+                                            <Input field={field} label="Address" placeholder="Enter Your Address" />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="address" />
+
+                                    <Field name="password">
+                                        {({ field }) => (
+                                            <Input field={field} type="password" label="Password" placeholder="Enter Your New Password" />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="password" />
+
+                                    <label className="label">
+                                        <span className="text-base label-text">Referral Code</span>
+                                    </label>
+                                    <input type="text" disabled placeholder="Referral Code" className="w-full input input-bordered" value={user?.data?.data?.referral_code} />
+
+                                </div>
+                            </div>
+                            <button type="submit" className="btn bg-blue-950 w-full mt-4 text-white">Edit</button>
+                        </Form>
+                    </Formik>
                 </div>
+            </div >
+            <div className="p-4 flex flex-col justify-center w-full items-center">
+                <p className="text-2xl font-bold">Transaction History</p>
+                <Table />
             </div>
-
-            <div className="w-full h-full">
-                <Formik initialValues={{ name: user?.data?.data.name, email: user?.data?.data.email, phone_number: user?.data?.data.phone_number, password: "", address: user?.data?.data.address, referral_code: user?.data?.data?.referral_code }} validationSchema={userSchema}
-                    onSubmit={async (values) => {
-                        await mutate(values)
-                    }}>
-                    <Form>
-                        <div className="flex justify-center gap-24">
-                            <div>
-                                <Field name="name" type="text">
-                                    {({ field }) => (
-                                        <Input field={field} label="Name" placeholder="Enter Your Username" />
-                                    )}
-                                </Field>
-                                <ErrorMessage name="name" />
-
-                                <Field name="email" type="text">
-                                    {({ field }) => (
-                                        <Input field={field} label="Email" placeholder="Enter Your Email" />
-                                    )}
-                                </Field>
-                                <ErrorMessage name="email" />
-
-                                <Field name="phone_number" type="text">
-                                    {({ field }) => (
-                                        <Input field={field} label="Phone Number" placeholder="Enter Your Phone Number" />
-                                    )}
-                                </Field>
-                                <ErrorMessage name="phone_number" />
-                            </div>
-
-                            <div>
-                                <Field name="address" type="text">
-                                    {({ field }) => (
-                                        <Input field={field} label="Address" placeholder="Enter Your Address" />
-                                    )}
-                                </Field>
-                                <ErrorMessage name="address" />
-
-                                <Field name="password">
-                                    {({ field }) => (
-                                        <Input field={field} type="password" label="Password" placeholder="Enter Your New Password" />
-                                    )}
-                                </Field>
-                                <ErrorMessage name="password" />
-
-                                <label className="label">
-                                    <span className="text-base label-text">Referral Code</span>
-                                </label>
-                                <input type="text" disabled placeholder="Referral Code" className="w-full input input-bordered" value={user?.data?.data?.referral_code} />
-
-                            </div>
-                        </div>
-                        <button type="submit" className="btn bg-blue-950 w-full mt-4 text-white">Edit</button>
-                    </Form>
-                </Formik>
-            </div>
-        </div >
+        </div>
     )
 }
