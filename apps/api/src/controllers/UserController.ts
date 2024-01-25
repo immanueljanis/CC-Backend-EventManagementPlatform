@@ -31,7 +31,7 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { email, name, password, phone_number, address, image } = req.body
+        const { email, name, password, phone_number, address } = req.body
 
         const data = await prisma.user.create({
             data: {
@@ -41,7 +41,7 @@ export const createUser = async (req: Request, res: Response) => {
                 phone_number,
                 address,
                 referral_code: referralGenerator(),
-                image: "testing.jpg"
+                image: "defaultUser.jpg"
             }
         })
 

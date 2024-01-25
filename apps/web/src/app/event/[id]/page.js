@@ -12,6 +12,7 @@ import { imagePath } from "../../../lib/path"
 import Modal from "../../../components/Modal"
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Review from "../../../components/Review"
 
 export default function Page() {
     const params = useParams()
@@ -20,6 +21,7 @@ export default function Page() {
     const [selectedMenu, setSelectedMenu] = useState('')
     const [ticket, setTicket] = useState({})
     const [buy, setBuy] = useState([])
+
     const onSelect = (item, operation) => {
         const prevTicket = { ...ticket } // {}
 
@@ -108,7 +110,7 @@ export default function Page() {
             </div>
             <div className="grid grid-cols-5 card-body">
                 <div className="grid justify-center col-span-3 ">
-                    <Image src={`${imagePath}/${data?.event?.Event_Image[0]?.filename}`} width={500} height={500} priority className="w-[100vw] h-[25vw] flex justify-center items-center" alt={`${data?.event?.title}`} />
+                    <Image src={`${imagePath}/${data?.event?.Event_Image[0]?.filename}`} width={1000} height={1000} priority className="w-[100vw] h-[25vw] flex justify-center items-center" alt={`${data?.event?.title}`} />
                 </div>
                 <div className="flex ml- card col-span-2 bg-base-100 shadow-xl">
                     <div className="card-body col-span-2 text-xxl flex">
@@ -147,66 +149,90 @@ export default function Page() {
                 </div>
             </div>
 
-
-            <div className="grid grid-cols-5">
-                <div className="col-span-3">
-                    <div className="flex justify-center gap-2">
-                        <div name="description" onClick={(e) => onChangeTabOpen(e)} className={selectedMenu === 'description' ? "bg-base-100 rounded-md border-b-4 border-b-indigo-500 h-[2vw] w-full flex justify-center" : "bg-base-100 rounded-md border-b-4 h-[2vw] w-full flex justify-center"} >
-                            Description
-                        </div>
-                        <div name='Event_Ticket' onClick={(e) => onChangeTabOpen(e)} className={selectedMenu === 'tickets' ? "bg-base-100 rounded-md border-b-4 border-b-indigo-500 h-[2vw] w-full flex justify-center" : "bg-base-100 rounded-md border-b-4 h-[2vw] w-full flex justify-center"}>
-                            Tiket
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        {
-                            typeof tabOpen === 'string' ?
-                                tabOpen
-                                :
-                                typeof tabOpen === 'object' ?
-                                    tabOpen?.map((item, index) => {
-                                        return (
-                                            <div key={index}>
-                                                <TiketCard item={item} onSelect={onSelect} stat={ticket} />
-                                            </div>
-                                        )
-                                    })
-                                    :
-                                    null
-                        }
-                    </div>
-                </div>
-
-                <div className="flex ml-card col-span-2 bg-base-100 shadow-xl">
-                    <div className="card w-full h-fit bg-base-100 shadow-xl">
-                        <div className="card-body">
-                            <p>Choose your ticket !!</p>
-                            <div>
-                                {
-                                    buy?.map((itm, index) => {
-                                        return (
-                                            <div className='grid'>
-                                                <div>
-                                                    {`${itm.quota} x ${itm.category}`}
-                                                </div>
-                                                <div>
-                                                    {formatRupiah(itm.price)}
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
+            {data?.event?.status != "done" &&
+                <div className="grid grid-cols-5">
+                    <div className="col-span-3">
+                        <div className="flex justify-center gap-2">
+                            <div name="description" onClick={(e) => onChangeTabOpen(e)} className={selectedMenu === 'description' ? "bg-base-100 rounded-md border-b-4 border-b-indigo-500 h-[2vw] w-full flex justify-center" : "bg-base-100 rounded-md border-b-4 h-[2vw] w-full flex justify-center"} >
+                                Description
                             </div>
-                            <div className="justify-center items-center w-full bg-blue-950 text-white rounded-lg">
-                                {buy.length > 0 ?
-                                    <Modal item={buy} name={data?.event?.title} />
-                                    :
-                                    null}
+                            <div name='Event_Ticket' onClick={(e) => onChangeTabOpen(e)} className={selectedMenu === 'tickets' ? "bg-base-100 rounded-md border-b-4 border-b-indigo-500 h-[2vw] w-full flex justify-center" : "bg-base-100 rounded-md border-b-4 h-[2vw] w-full flex justify-center"}>
+                                Tiket
                             </div>
                         </div>
+                        <div className="flex flex-col gap-3">
+                            {
+                                typeof tabOpen === 'string' ?
+                                    tabOpen
+                                    :
+                                    typeof tabOpen === 'object' ?
+                                        tabOpen?.map((item, index) => {
+                                            return (
+                                                <div key={index}>
+                                                    <TiketCard item={item} onSelect={onSelect} stat={ticket} />
+                                                </div>
+                                            )
+                                        })
+                                        :
+                                        null
+                            }
+                        </div>
+                    </div>
+
+                    <div className="flex ml-card col-span-2 bg-base-100 shadow-xl">
+                        <div className="card w-full h-fit bg-base-100 shadow-xl">
+                            <div className="card-body">
+                                <p>Choose your ticket !!</p>
+                                <div>
+                                    {
+                                        buy?.map((itm, index) => {
+                                            return (
+                                                <div className='grid'>
+                                                    <div>
+                                                        {`${itm.quota} x ${itm.category}`}
+                                                    </div>
+                                                    <div>
+                                                        {formatRupiah(itm.price)}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                <div className="justify-center items-center w-full bg-blue-950 text-white rounded-lg">
+                                    {buy.length > 0 ?
+                                        <Modal item={buy} name={data?.event?.title} />
+                                        :
+                                        null}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+
+            {data?.event?.Event_Rating.length > 0 &&
+                <div className="overflow-x-auto w-full px-8">
+                    <p className="text-2xl font-bold">Review from Attendee</p>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Rating</th>
+                                <th>Review</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data?.event?.Event_Rating.map((item, index) => {
+                                return (
+                                    <Review item={item} index={index} />
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     )
 }
