@@ -9,7 +9,7 @@ export default function Page({ children }) {
   if (adminPath.includes(pathName)) return (<>{children}</>)
 
   return (
-    <footer className="footer p-10 bg-blue-950 text-neutral-content">
+    <footer className="footer p-10 bg-blue-950 text-neutral-content mt-14 text-white">
       <aside>
         <p>Mendadak Event.<br />Providing integrity ticket platform since 2005</p>
       </aside>
